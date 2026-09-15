@@ -24,6 +24,7 @@ A console-based ERP system for managing food production, recipes, raw materials,
 * Automatically consume raw materials
 * Automatically add finished products to stock
 * Transaction-based production processing
+* Configurable database name through environment variables
 
 ## Architecture
 
@@ -56,24 +57,60 @@ ProjectERP/
     └── erp.h
 ```
 
+## Database Structure
+
+The database contains the following main entities:
+
+* Products
+* Raw materials
+* Recipes
+* Recipe items
+* Raw material stock
+* Product stock
+* Production orders
+
+The system models the relationship between finished products and the raw materials required for production.
+
+## Production Workflow
+
+```text
+Production Order
+       ↓
+Find product recipe
+       ↓
+Calculate required raw materials
+       ↓
+Check warehouse stock
+       ↓
+If materials are available
+       ↓
+Consume raw materials
+       ↓
+Add finished products to stock
+       ↓
+Mark order as COMPLETED
+```
+
+Production processing is performed inside a PostgreSQL transaction so that related database changes are committed atomically.
+
 ## Database Setup
 
-Create the database:
+Create a PostgreSQL database:
 
 ```bash
-createdb shop
+createdb food_erp_test
 ```
 
 Apply the database schema:
 
 ```bash
-psql shop -f DB/schema.sql
+psql food_erp_test -f DB/schema.sql
 ```
 
 Insert test data:
 
 ```bash
-psql shop -f DB/seed.sql
+psql food_erp_test -f DB/seed.sql
 ```
 
 ## Build
@@ -87,8 +124,25 @@ cmake --build build
 
 ## Run
 
+The application uses the `DB_NAME` environment variable to determine which PostgreSQL database to connect to.
+
+Set the database name and start the application:
+
 ```bash
+export DB_NAME=food_erp_test
 ./build/food-erp
+```
+
+You can also provide the variable only for a single run:
+
+```bash
+DB_NAME=food_erp_test ./build/food-erp
+```
+
+If `DB_NAME` is not set, the application will ask for the database name when it starts:
+
+```text
+Database name:
 ```
 
 ## Usage
@@ -131,27 +185,11 @@ Order ID: 3
 Production order completed successfully!
 ```
 
-## Production Workflow
+## Development Environment
 
-```text
-Production Order
-       ↓
-Find product recipe
-       ↓
-Calculate required raw materials
-       ↓
-Check warehouse stock
-       ↓
-If materials are available
-       ↓
-Consume raw materials
-       ↓
-Add finished products to stock
-       ↓
-Mark order as COMPLETED
-```
+The project is designed to be built and run on Linux with PostgreSQL and CMake.
 
-Production processing is performed inside a PostgreSQL transaction to ensure that related database changes are committed atomically.
+The database connection is configurable through the `DB_NAME` environment variable, allowing the application to work with different PostgreSQL databases without modifying the source code.
 
 ## Purpose
 
