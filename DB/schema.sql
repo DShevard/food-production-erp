@@ -43,7 +43,7 @@ CREATE TABLE raw_material_stock (
 
 CREATE TABLE product_stock (
     product_id INT PRIMARY KEY,
-    quantity NUMERIC(12, 3) NOT NULL CHECK (quantity >= 0),
+    quantity INT NOT NULL CHECK (quantity >= 0),
 
     FOREIGN KEY (product_id)
         REFERENCES products(id)
@@ -52,7 +52,7 @@ CREATE TABLE product_stock (
 CREATE TABLE production_orders (
     id SERIAL PRIMARY KEY,
     product_id INT NOT NULL,
-    quantity NUMERIC(12, 3) NOT NULL CHECK (quantity > 0),
+    quantity INT NOT NULL CHECK (quantity > 0),
     status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

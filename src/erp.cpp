@@ -227,7 +227,7 @@ void completeProductionOrder(PGconn* conn)
         std::cout << "Please enter a number.\n";
         return;
     }
-    
+
     // Start transaction
     PGresult* beginResult = PQexec(conn, "BEGIN");
 
@@ -257,17 +257,15 @@ void completeProductionOrder(PGconn* conn)
         return;
     }
 
-    //to this moment
+    // to this moment
 
     int productId = std::stoi(PQgetvalue(orderResult, 0, 0));
-    double productionQuantity = std::stod(PQgetvalue(orderResult, 0, 1));
+    int productionQuantity = std::stoi(PQgetvalue(orderResult, 0, 1));
 
     PQclear(orderResult);
 
     // Check raw materials
-    std::string checkQuery = "SELECT rm.name, rms.quantity, "
-                             "       ri.quantity * " +
-                             std::to_string(productionQuantity) +
+    std::string checkQuery = "SELECT rm.name, rms.quantity, ri.quantity * " + std::to_string(productionQuantity) +
                              " "
                              "FROM recipe_items ri "
                              "JOIN recipes r ON r.id = ri.recipe_id "
