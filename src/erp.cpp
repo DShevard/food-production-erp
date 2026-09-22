@@ -134,12 +134,9 @@ void createProductionOrder(PGconn* conn)
     }
 
     // Check that the product exists
-    std::string productIdStr = std::to_string(productId);
+    std::string productQuery = "SELECT id FROM products WHERE id = " + std::to_string(productId) + ";";
 
-    const char* params[1] = {productIdStr.c_str()};
-
-    PGresult* checkResult =
-        PQexecParams(conn, "SELECT id FROM products WHERE id = $1;", 1, nullptr, params, nullptr, nullptr, 0);
+    PGresult* checkResult = PQexec(conn, productQuery.c_str());
 
     if (PQresultStatus(checkResult) != PGRES_TUPLES_OK)
     {
@@ -161,15 +158,22 @@ void createProductionOrder(PGconn* conn)
     std::cout << "Quantity: ";
     std::cin >> quantity;
 
-    std::string quantityStr = std::to_string(quantity);
+    if (std::cin.fail())
+    {
+        std::cin.clear();
+        std::cin.ignore(1000, '\n');
 
-    const char* insertParams[2] = {productIdStr.c_str(), quantityStr.c_str()};
+        std::cout << "Please enter a number.\n";
+        return;
+    }
 
-    PGresult* result = PQexecParams(conn,
-                                    "INSERT INTO production_orders (product_id, quantity) "
-                                    "VALUES ($1, $2) "
-                                    "RETURNING id;",
-                                    2, nullptr, insertParams, nullptr, nullptr, 0);
+    std::string insertQuery = "INSERT INTO production_orders (product_id, quantity) "
+                              "VALUES (" +
+                              std::to_string(productId) + ", " + std::to_string(quantity) +
+                              ") "
+                              "RETURNING id;";
+
+    PGresult* result = PQexec(conn, insertQuery.c_str());
 
     if (PQresultStatus(result) != PGRES_TUPLES_OK)
     {
