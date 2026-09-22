@@ -52,5 +52,6 @@ INSERT INTO product_stock (product_id, quantity) VALUES
 
 -- Production orders
 INSERT INTO production_orders (product_id, quantity, status) VALUES
-(1, 100.000, 'PENDING'),
-(2, 50.000, 'PENDING');
+(1, 100.000, 'COMPLETED'),
+(2, 50.000, 'COMPLETED'),
+(3, 30.000, 'COMPLETED');

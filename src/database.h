@@ -2,8 +2,9 @@
 
 #include <libpq-fe.h>
 
-class Database {
-public:
+class Database
+{
+  public:
     Database();
     ~Database();
 
@@ -11,6 +12,6 @@ public:
 
     bool isConnected() const;
 
-private:
+  private:
     PGconn* conn;
 };

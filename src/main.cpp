@@ -13,7 +13,7 @@ int main()
         return 1;
     }
 
-    PGconn *conn = db.connection();
+    PGconn* conn = db.connection();
 
     std::cout << "Connected to PostgreSQL successfully!\n";
 
@@ -68,8 +68,6 @@ int main()
         }
 
     } while (choice != 0);
-
-    PQfinish(conn);
 
     return 0;
 }
