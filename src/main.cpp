@@ -69,7 +69,5 @@ int main()
 
     } while (choice != 0);
 
-    PQfinish(conn);
-
     return 0;
 }
