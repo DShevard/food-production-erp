@@ -257,8 +257,6 @@ void completeProductionOrder(PGconn* conn)
         return;
     }
 
-    // to this moment
-
     int productId = std::stoi(PQgetvalue(orderResult, 0, 0));
     int productionQuantity = std::stoi(PQgetvalue(orderResult, 0, 1));
 
@@ -305,8 +303,6 @@ void completeProductionOrder(PGconn* conn)
     }
 
     PQclear(checkResult);
-
-    // up to this 2 point I think I get it
     
     // Consume raw materials
     std::string updateStockQuery = "UPDATE raw_material_stock rms "
