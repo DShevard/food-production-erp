@@ -82,6 +82,31 @@ void showStock(PGconn* conn)
     }
 
     PQclear(result);
+
+    PGresult* productResult = PQexec(conn, "SELECT p.name, ps.quantity, p.unit "
+                                           "FROM product_stock ps "
+                                           "JOIN products p "
+                                           "ON p.id = ps.product_id "
+                                           "ORDER BY p.id;");
+
+    if (PQresultStatus(productResult) != PGRES_TUPLES_OK)
+    {
+        std::cerr << "Query failed: " << PQerrorMessage(conn);
+        PQclear(productResult);
+        return;
+    }
+
+    std::cout << "\n=== Finished Product Stock ===\n";
+
+    int productRows = PQntuples(productResult);
+
+    for (int row = 0; row < productRows; ++row)
+    {
+        std::cout << PQgetvalue(productResult, row, 0) << ": " << PQgetvalue(productResult, row, 1) << " "
+                  << PQgetvalue(productResult, row, 2) << '\n';
+    }
+
+    PQclear(productResult);
 }
 
 void showProductionOrders(PGconn* conn)
@@ -195,6 +220,14 @@ void completeProductionOrder(PGconn* conn)
     std::cout << "Order ID: ";
     std::cin >> orderId;
 
+    if (std::cin.fail())
+    {
+        std::cin.clear();
+        std::cin.ignore(1000, '\n');
+        std::cout << "Please enter a number.\n";
+        return;
+    }
+    
     // Start transaction
     PGresult* beginResult = PQexec(conn, "BEGIN");
 
@@ -223,6 +256,8 @@ void completeProductionOrder(PGconn* conn)
         PQexec(conn, "ROLLBACK");
         return;
     }
+
+    //to this moment
 
     int productId = std::stoi(PQgetvalue(orderResult, 0, 0));
     double productionQuantity = std::stod(PQgetvalue(orderResult, 0, 1));
