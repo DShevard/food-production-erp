@@ -265,8 +265,7 @@ void completeProductionOrder(PGconn* conn)
     PQclear(orderResult);
 
     // Check raw materials
-    std::string checkQuery = "SELECT rm.name, rms.quantity, ri.quantity * " + std::to_string(productionQuantity) +
-                             " "
+    std::string checkQuery = "SELECT rm.name, rms.quantity, ri.quantity"
                              "FROM recipe_items ri "
                              "JOIN recipes r ON r.id = ri.recipe_id "
                              "JOIN raw_materials rm ON rm.id = ri.raw_material_id "
@@ -290,7 +289,9 @@ void completeProductionOrder(PGconn* conn)
     for (int row = 0; row < rows; ++row)
     {
         double stock = std::stod(PQgetvalue(checkResult, row, 1));
-        double required = std::stod(PQgetvalue(checkResult, row, 2));
+        double recipeQuantity = std::stod(PQgetvalue(checkResult, row, 2));
+
+        double required = recipeQuantity * productionQuantity;
 
         if (stock < required)
         {
@@ -305,6 +306,8 @@ void completeProductionOrder(PGconn* conn)
 
     PQclear(checkResult);
 
+    // up to this 2 point I think I get it
+    
     // Consume raw materials
     std::string updateStockQuery = "UPDATE raw_material_stock rms "
                                    "SET quantity = rms.quantity - "
